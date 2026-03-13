@@ -1,0 +1,25 @@
+{
+  "name": "pdf_interativo_js",
+  "version": "1.0.0",
+  "description": "Este código foi desenvolvido com Javascript, com intuito de gerar PDF's interativos para serem usados em redes sociais de páginas de vendas.",
+  "main": "principal.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/giovanegiow/PDF_Interativo_JS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/giovanegiow/PDF_Interativo_JS/issues"
+  },
+  "homepage": "https://github.com/giovanegiow/PDF_Interativo_JS#readme",
+  "dependencies": {
+    "jspdf": "^4.2.0",
+    "xlsx": "^0.18.5"
+  }
+}

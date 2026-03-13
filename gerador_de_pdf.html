@@ -7,25 +7,18 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css">
-    <title>Olá Alane, gere seu PDF interativo aqui</title>
+    <title>Gerar PDF com Excel</title>
 </head>
 
-<body>
-    <div class="modal" tabindex="-1" id="myModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Modal title</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<body class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+    <div id="telaPrincipal" class="col-3 mx-auto mt-5 d-flex align-items-center justify-content-center">
+        <div class="text-center">
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('excelFile').click()">Selecionar arquivo Excel</button>
+                <input type="file" id="excelFile" name="excelFile" accept=".xlsx, .xls" hidden>
             </div>
-            <div class="modal-body">
-                <p>Modal body text goes here.</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-            </div>
+
+            <p id="textoBoasVindas">Olá, gere seu PDF aqui</p>
         </div>
     </div>
 

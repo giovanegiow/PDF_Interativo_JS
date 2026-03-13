@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Lançar no Chrome contra localhost",
+            "type": "chrome",
+            "request": "launch",
+            "url": "http://127.0.0.1:5500/gerador_de_pdf.html",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}
