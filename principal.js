@@ -7,212 +7,214 @@ window.onload = function () {
             const data = new Uint8Array(event.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
 
-            // Lê a primeira planilha
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
 
-            // Converte para JSON
             const itensPlanilha = XLSX.utils.sheet_to_json(worksheet);
-            await gerarCatalogo(itensPlanilha, "");
 
-            //Verifica os nomes presentes no cabeçalho do excel
-            itensPlanilha.forEach(linha => {
-                const campos = Object.keys(linha);
-
-                campos.forEach(nomeColuna => {
-                    const valor = linha[nomeColuna];
-
-                    console.log(nomeColuna + '-' + valor);
-                })
-            })
+            await gerarCatalogo(itensPlanilha);
         };
+
         reader.readAsArrayBuffer(file);
     });
-}
+};
 
-async function gerarCatalogo(itensPlanilha, logo) {
-    let container = "";
+async function gerarCatalogo(itensPlanilha) {
 
     let htmlProdutos = "";
-    for (let item of itensPlanilha) {
-        const descricao = item.descricao;
-        const valor = item.valor;
-        const mensagem = encodeURIComponent(`Olá, gostaria de mais informações sobre ${descricao}`);
-        const urlWhatsapp = `https://wa.me/5541999999999?text=${mensagem}`;
+    const formatador = new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+    });
 
-        htmlProdutos += `
-            <div style="border: 1px solid #e0e0e0; border-radius: 8px; padding: 10px; text-align: center; background: white; break-inside: avoid;">
-                <img src="imagens/${descricao}.png" style="width: 100%; height: 120px; object-fit: contain;" 
-                     onerror="this.src='https://via.placeholder.com/150'">
-                <div style="font-weight: 600; font-size: 14px; margin-top: 8px; color: #333;">${descricao}</div>
-                <div style="margin-top: 6px; font-size: 16px; font-weight: bold; color: #0d6efd;">R$ ${valor}</div>
-                <a href="${urlWhatsapp}" target="_blank" 
-                   style="text-decoration: none; background-color: #25D366; color: white; padding: 8px 12px; border-radius: 5px; font-size: 12px; display: inline-block; margin-top: 10px; font-family: sans-serif;">
-                    Quero mais informações
-                </a>
-            </div>
-        `;
+    let contadorItem = 0, contadorLinhas = 1;
+
+    for (let item of itensPlanilha) {
+
+        const descricao = item.descricao;
+        const valor = formatador.format(item.valor);
+
+        const mensagem = encodeURIComponent(`Olá, gostaria de mais informações sobre ${descricao}`);
+        const urlWhatsapp = `https://wa.me/5541988685776?text=${mensagem}`;
+
+        let bool = false;
+        if (contadorItem > 2){ //Elimina erros matemáticos na primeira linha
+            //Verifica se o item está na posição 9, 10 e 11 da página
+            if (contadorItem % 9 === 0) bool = true;
+            if ((contadorItem - 1) % 9 === 0) bool = true;
+            if ((contadorItem - 2) % 9 === 0) bool = true;
+        }
+
+        
+
+        if (bool){
+            htmlProdutos += `
+                <div class="cardProduto" style="margin-top: 300px;">
+                    <img src="imagens/${descricao}.png">
+                    <div class="nomeProduto">${descricao}</div>
+                    <a href="${urlWhatsapp}" target="_blank" class="btn">Quero mais informações</a>
+                    <div class="precoProduto">${valor}</div>
+                </div>
+            `;
+
+            contadorLinhas++;
+        } else {
+            htmlProdutos += `
+                <div class="cardProduto">
+                    <img src="imagens/${descricao}.png">
+                    <div class="nomeProduto">${descricao}</div>
+                    <a href="${urlWhatsapp}" target="_blank" class="btn">Quero mais informações</a>
+                    <div class="precoProduto">${valor}</div>
+                </div>
+            `;
+        }
+
+        contadorItem++;
     }
 
-    container = `
-        <!DOCTYPE html>
-        <html lang="pt-br">
+    const containerHTML = `
+        <div class="pagina">
 
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-
-            <title>Catálogo de Produtos</title>
-
-            <style>
-                body {
-                    width: 21cm;
-                    height: 29.7cm;
-                    margin: auto;
-                    background: #f1f1f1;
-                    font-family: Arial, Helvetica, sans-serif;
-                }
-
-                .pagina {
-                    background: white;
-                    padding: 20px;
-                }
-
-                .topoCatalogo {
-                    border-bottom: 2px solid #e5e5e5;
-                    padding-bottom: 10px;
-                    margin-bottom: 20px;
-                }
-
-                .logo {
-                    width: 80px;
-                }
-
-                .tituloCatalogo {
-                    font-size: 28px;
-                    font-weight: bold;
-                }
-
-                #gridProdutos {
-                    display: grid;
-                    grid-template-columns: repeat(3, 1fr);
-                    gap: 20px;
-                }
-
-                .cardProduto {
-                    border: 1px solid #e0e0e0;
-                    border-radius: 8px;
-                    padding: 10px;
-                    text-align: center;
-                }
-
-                .cardProduto img {
-                    width: 100%;
-                    height: 120px;
-                    object-fit: contain;
-                }
-
-                .nomeProduto {
-                    font-weight: 600;
-                    font-size: 14px;
-                    margin-top: 8px;
-                }
-
-                .descricaoProduto {
-                    font-size: 12px;
-                    color: #666;
-                    height: 32px;
-                    overflow: hidden;
-                }
-
-                .precoProduto {
-                    margin-top: 6px;
-                    font-size: 16px;
-                    font-weight: bold;
-                    color: #0d6efd;
-                }
-
-                .btnMaisInformacoes {
-                    font-size: 12px;
-                }
-            </style>
-
-        </head>
-
-        <body id="corpoCatalogo">
-
-            <div class="pagina">
-
-                <div class="topoCatalogo d-flex align-items-center justify-content-between">
-
-                    <div class="d-flex align-items-center gap-3">
-                        <img class="logo" src="https://via.placeholder.com/80">
-                        <div class="tituloCatalogo">Catálogo de Produtos</div>
-                    </div>
-
-                    <div>
-                        <small>Data: 03/2026</small>
-                    </div>
-
+            <div class="topoCatalogo">
+                <div class="topoEsquerda">
+                    <img class="logo" src="imagens/logo.png">
+                    <div class="tituloCatalogo">Catálogo de Produtos</div>
                 </div>
-
-                <div id="gridProdutos">
-
-                    ${htmlProdutos}
-
+                <div>
+                    <small>Data: ${dataAtual()}</small>
                 </div>
-
             </div>
-        </body>
 
-        </html>
+            <div id="gridProdutos">
+                ${htmlProdutos}
+            </div>
+
+        </div>
     `;
 
+    const div = document.createElement('div');
+    div.style.visibility = 'hidden';
+    div.innerHTML = containerHTML;
+
+    div.style.width = '794px';
+    div.style.margin = '0 auto';
+    div.style.fontFamily = 'Arial, sans-serif';
+
+    const style = document.createElement('style');
+    style.innerHTML = `
+        .pagina {
+            background: white;
+            padding: 20px;
+        }
+
+        .topoCatalogo {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #e5e5e5;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .topoEsquerda {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .tituloCatalogo {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        #gridProdutos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .cardProduto {
+            width: 240px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+        }
+
+        .cardProduto img {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+        }
+
+        .nomeProduto {
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .precoProduto {
+            margin-top: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 6px 10px;
+            font-size: 12px;
+            background-color: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+    `;
+
+    document.head.appendChild(style);
+    document.body.appendChild(div);
+
+    div.style.visibility = 'visible';
+
     const opt = {
-        margin: 5,
+        margin: 0,
         filename: 'catalogo.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
+        image: { type: 'jpeg', quality: 1 },
         html2canvas: {
             scale: 2,
-            useCORS: true,
-            scrollY: 0,
-            windowWidth: 794
+            useCORS: true
         },
-        jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' },
-        enableLinks: true
+        jsPDF: {
+            unit: 'pt',
+            format: 'a4',
+            orientation: 'portrait'
+        }
     };
 
-    try {
-        await new Promise(resolve => setTimeout(resolve, 500));
+    await html2pdf().set(opt).from(div).save();
+    
+    document.body.removeChild(div);
+    document.head.removeChild(style);
 
-        await html2pdf().set(opt).from(container).save();
-    } catch (error) {
-        console.error("Erro ao gerar PDF:", error);
-        alert("Erro ao gerar o arquivo. Verifique o console.");
-    } finally {
-        document.body.removeChild(container);
-    }
+    window.location.reload();
 }
 
 function dataAtual() {
-    let data = new Date;
-    let dataAtual = '';
+    const data = new Date();
 
-    let dia = data.getDate();
-    let mes = (data.getMonth() + 1);
+    let dia = String(data.getDate()).padStart(2, '0');
+    let mes = String(data.getMonth() + 1).padStart(2, '0');
     let ano = data.getFullYear();
 
-    if (dia < 10) {
-        dia = "0" + dia;
-    }
-    if (mes < 10) {
-        mes = "0" + mes;
-    }
-
-    dataAtual = dia + "/" + mes + "/" + ano;
-
-    return dataAtual;
-
+    return `${dia}/${mes}/${ano}`;
 }
