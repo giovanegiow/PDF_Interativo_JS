@@ -5,7 +5,7 @@
             "name": "Lançar no Chrome contra localhost",
             "type": "chrome",
             "request": "launch",
-            "url": "http://127.0.0.1:5500/gerador_de_pdf.html",
+            "url": "http://127.0.0.1:5500/GeradorPDF.html",
             "webRoot": "${workspaceFolder}"
         }
     ]

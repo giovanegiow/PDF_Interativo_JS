@@ -1,7 +1,7 @@
 window.onload = function () {
     document.getElementById('excelFile').addEventListener('click', () => {
-        const telefone = document.getElementById('telefone').value;
-        if (telefone == "" || removerDigitosTelefone(telefone).length < 12){
+        const telefone = removerDigitosTelefone(document.getElementById('telefone').value)
+        if (telefone == "" || telefone.length < 11){
             habilitaAlertaTelefone();
             return;
         } else {
@@ -62,7 +62,7 @@ async function gerarCatalogo(itensPlanilha) {
         if (bool) {
             htmlProdutos += `
                 <div class="cardProduto" style="margin-top: 300px;">
-                    <img src="../imagens/${descricao}.png">
+                    <img src="imagens/${descricao}.png">
                     <div class="nomeProduto">${descricao}</div>
                     <a href="${urlWhatsapp}" target="_blank" class="btn">Quero mais informações</a>
                     <div class="precoProduto">${valor}</div>
@@ -73,7 +73,7 @@ async function gerarCatalogo(itensPlanilha) {
         } else {
             htmlProdutos += `
                 <div class="cardProduto">
-                    <img src="../imagens/${descricao}.png">
+                    <img src="imagens/${descricao}.png">
                     <div class="nomeProduto">${descricao}</div>
                     <a href="${urlWhatsapp}" target="_blank" class="btn">Quero mais informações</a>
                     <div class="precoProduto">${valor}</div>
@@ -89,7 +89,7 @@ async function gerarCatalogo(itensPlanilha) {
 
             <div class="topoCatalogo">
                 <div class="topoEsquerda">
-                    <img class="logo" src="../imagens/logo.png">
+                    <img class="logo" src="imagens/logo.png">
                     <div class="tituloCatalogo">Catálogo de Produtos</div>
                 </div>
                 <div>
@@ -218,7 +218,7 @@ async function gerarCatalogo(itensPlanilha) {
     document.body.removeChild(div);
     document.head.removeChild(style);
 
-    window.location.href = '/Executavel/GeradorPDF.html';
+    window.location.reload();
 }
 
 function habilitaAlertaTelefone() {
