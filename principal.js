@@ -1,4 +1,14 @@
 window.onload = function () {
+    document.getElementById('excelFile').addEventListener('click', () => {
+        const telefone = document.getElementById('telefone').value;
+        if (telefone == "" || removerDigitosTelefone(telefone).length < 12){
+            habilitaAlertaTelefone();
+            return;
+        } else {
+            document.getElementById('excelFile').type="file"
+        }
+    })
+    
     document.getElementById('excelFile').addEventListener('change', (e) => {
         const file = e.target.files[0];
         const reader = new FileReader();
@@ -17,6 +27,8 @@ window.onload = function () {
 
         reader.readAsArrayBuffer(file);
     });
+
+    $('#telefone').mask('(00) 00000-0000');
 };
 
 async function gerarCatalogo(itensPlanilha) {
@@ -35,22 +47,22 @@ async function gerarCatalogo(itensPlanilha) {
         const valor = formatador.format(item.valor);
 
         const mensagem = encodeURIComponent(`Olá, gostaria de mais informações sobre ${descricao}`);
-        const urlWhatsapp = `https://wa.me/5541988685776?text=${mensagem}`;
+        const urlWhatsapp = `https://wa.me/55${removerDigitosTelefone(document.getElementById('telefone').value)}?text=${mensagem}`;
 
         let bool = false;
-        if (contadorItem > 2){ //Elimina erros matemáticos na primeira linha
+        if (contadorItem > 2) { //Elimina erros matemáticos na primeira linha
             //Verifica se o item está na posição 9, 10 e 11 da página
             if (contadorItem % 9 === 0) bool = true;
             if ((contadorItem - 1) % 9 === 0) bool = true;
             if ((contadorItem - 2) % 9 === 0) bool = true;
         }
 
-        
 
-        if (bool){
+
+        if (bool) {
             htmlProdutos += `
                 <div class="cardProduto" style="margin-top: 300px;">
-                    <img src="imagens/${descricao}.png">
+                    <img src="../imagens/${descricao}.png">
                     <div class="nomeProduto">${descricao}</div>
                     <a href="${urlWhatsapp}" target="_blank" class="btn">Quero mais informações</a>
                     <div class="precoProduto">${valor}</div>
@@ -61,7 +73,7 @@ async function gerarCatalogo(itensPlanilha) {
         } else {
             htmlProdutos += `
                 <div class="cardProduto">
-                    <img src="imagens/${descricao}.png">
+                    <img src="../imagens/${descricao}.png">
                     <div class="nomeProduto">${descricao}</div>
                     <a href="${urlWhatsapp}" target="_blank" class="btn">Quero mais informações</a>
                     <div class="precoProduto">${valor}</div>
@@ -77,7 +89,7 @@ async function gerarCatalogo(itensPlanilha) {
 
             <div class="topoCatalogo">
                 <div class="topoEsquerda">
-                    <img class="logo" src="imagens/logo.png">
+                    <img class="logo" src="../imagens/logo.png">
                     <div class="tituloCatalogo">Catálogo de Produtos</div>
                 </div>
                 <div>
@@ -202,11 +214,35 @@ async function gerarCatalogo(itensPlanilha) {
     };
 
     await html2pdf().set(opt).from(div).save();
-    
+
     document.body.removeChild(div);
     document.head.removeChild(style);
 
-    window.location.reload();
+    window.location.href = '/Executavel/GeradorPDF.html';
+}
+
+function habilitaAlertaTelefone() {
+    const swalWithBootstrapButtons = Swal.mixin({
+        customClass: {
+            confirmButton: "btn btn-success",
+        },
+        buttonsStyling: false
+    });
+    swalWithBootstrapButtons.fire({
+        title: "Não foi possível gerar o catálogo",
+        text: "O campo de telefone está em branco ou incompleto. Informe um número de telefone para gerar os botões redirecionáveis no seu catálogo interativo.",
+        icon: "warning",
+        confirmButtonText: "Ok",
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed){
+            setTimeout(() => {
+                document.getElementById('telefone').focus();
+                document.getElementById('telefone').select();
+            }, 500);
+            
+        }
+    });
 }
 
 function dataAtual() {
@@ -217,4 +253,8 @@ function dataAtual() {
     let ano = data.getFullYear();
 
     return `${dia}/${mes}/${ano}`;
+}
+
+function removerDigitosTelefone(telefone) {
+    return telefone.replace(/\D/g, '');
 }
